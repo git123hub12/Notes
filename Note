@@ -1,0 +1,105 @@
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Scanner;
+
+class TextNote {
+    private String content;
+    private String timestamp;
+
+    public TextNote(String content, String timestamp) {
+        this.content = content;
+        this.timestamp = timestamp;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public String getTimestamp() {
+        return timestamp;
+    }
+}
+
+class TextNoteApp {
+    private ArrayList<TextNote> notes;
+    private Scanner scanner;
+
+    public TextNoteApp() {
+        notes = new ArrayList<>();
+        scanner = new Scanner(System.in);
+    }
+
+    public void addTextNote() {
+        System.out.print("Enter your text note: ");
+        String content = scanner.nextLine();
+        String timestamp = getCurrentTimestamp();
+        TextNote textNote = new TextNote(content, timestamp);
+        notes.add(textNote);
+        saveNoteToFile(textNote);
+        System.out.println("Text note added successfully!\n");
+    }
+
+    public void displayTextNotes() {
+        if (notes.isEmpty()) {
+            System.out.println("No text notes available.\n");
+        } else {
+            System.out.println("------ Your Text Notes ------");
+            for (TextNote textNote : notes) {
+                System.out.println("Timestamp: " + textNote.getTimestamp());
+                System.out.println("Content: " + textNote.getContent());
+                System.out.println("-----------------------------");
+            }
+        }
+    }
+
+    private String getCurrentTimestamp() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return dateFormat.format(new Date());
+    }
+
+    private void saveNoteToFile(TextNote textNote) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("notes.txt", true))) {
+            writer.write("Timestamp: " + textNote.getTimestamp() + "\n");
+            writer.write("Content: " + textNote.getContent() + "\n");
+            writer.write("-----------------------------\n");
+        } catch (IOException e) {
+            System.out.println("Error saving note to file: " + e.getMessage());
+        }
+    }
+
+    public static void main(String[] args) {
+        TextNoteApp textNoteApp = new TextNoteApp();
+        Scanner scanner = new Scanner(System.in);
+
+        int choice;
+        do {
+            System.out.println("Text Note Application");
+            System.out.println("1. Add Text Note");
+            System.out.println("2. Display Text Notes");
+            System.out.println("3. Exit");
+            System.out.print("Enter your choice: ");
+            choice = scanner.nextInt();
+            scanner.nextLine(); // Consume the newline character
+
+            switch (choice) {
+                case 1:
+                    textNoteApp.addTextNote();
+                    break;
+                case 2:
+                    textNoteApp.displayTextNotes();
+                    break;
+                case 3:
+                    System.out.println("Exiting Text Note Application. Goodbye!");
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.\n");
+            }
+        } while (choice != 3);
+
+        scanner.close();
+    }
+}
